@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Penyusun Jadwal Piket Helpdesk Coretax</title>
+<style>
+  :root{
+    --navy-950:#0b1b34;
+    --navy-900:#0f2247;
+    --navy-800:#152d5c;
+    --navy-700:#1c3a74;
+    --navy-100:#e7edf8;
+    --paper:#f6f4ee;
+    --paper-2:#ffffff;
+    --ink:#1a2233;
+    --ink-soft:#5b6478;
+    --gold:#b8873b;
+    --ok:#3f7d5c;
+    --ok-bg:#e5f1ea;
+    --warn:#a8461f;
+    --warn-bg:#fbe9e0;
+    --line:#d9d3c4;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Georgia','Iowan Old Style',serif;
+    background:var(--paper);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .util{font-family:'Courier New',monospace;}
+  header.app{
+    background:linear-gradient(135deg,var(--navy-950),var(--navy-800));
+    color:var(--navy-100);
+    padding:28px 32px 22px;
+    border-bottom:4px solid var(--gold);
+  }
+  header.app .eyebrow{
+    font-family:'Courier New',monospace;
+    letter-spacing:.18em;
+    font-size:11px;
+    text-transform:uppercase;
+    color:#c9b98a;
+    margin-bottom:6px;
+  }
+  header.app h1{
+    margin:0;
+    font-size:26px;
+    font-weight:400;
+    letter-spacing:.01em;
+  }
+  header.app p{margin:6px 0 0;color:#b9c4dc;font-size:13.5px;max-width:760px;line-height:1.5;}
+
+  .wrap{max-width:1280px;margin:0 auto;padding:24px 32px 80px;}
+
+  section.card{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:2px;
+    margin-bottom:22px;
+    box-shadow:0 1px 2px rgba(15,34,71,.04);
+  }
+  section.card .card-head{
+    display:flex;align-items:baseline;justify-content:space-between;
+    padding:16px 20px 12px;border-bottom:1px solid var(--line);
+    flex-wrap:wrap;gap:8px;
+  }
+  section.card .card-head h2{
+    margin:0;font-size:16px;font-weight:700;color:var(--navy-900);
+    font-family:'Courier New',monospace;letter-spacing:.02em;
+  }
+  section.card .card-head .num{
+    color:var(--gold);margin-right:8px;
+  }
+  section.card .card-head .hint{font-size:12px;color:var(--ink-soft);font-family:Georgia,serif;}
+  section.card .card-body{padding:16px 20px 20px;}
+
+  .btn{
+    font-family:'Courier New',monospace;
+    font-size:12.5px;letter-spacing:.03em;
+    border:1px solid var(--navy-900);
+    background:var(--navy-900);color:#fff;
+    padding:9px 16px;border-radius:2px;cursor:pointer;
+    text-transform:uppercase;
+  }
+  .btn:hover{background:var(--navy-700);}
+  .btn.secondary{background:transparent;color:var(--navy-900);}
+  .btn.secondary:hover{background:var(--navy-100);}
+  .btn.ghost{border-color:var(--line);color:var(--ink-soft);background:transparent;}
+  .btn.small{padding:5px 10px;font-size:11px;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+
+  .row{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;}
+  .field{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-family:'Courier New',monospace;}
+  .field input, .field select{
+    font-family:Georgia,serif;font-size:13.5px;padding:7px 9px;border:1px solid var(--line);
+    border-radius:2px;background:#fff;color:var(--ink);
+  }
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:middle;}
+  thead th{
+    background:var(--navy-900);color:#fff;font-family:'Courier New',monospace;
+    font-size:11px;text-transform:uppercase;letter-spacing:.03em;font-weight:600;
+    position:sticky;top:0;
+  }
+  tbody tr:nth-child(even){background:#fbfaf6;}
+  .tbl-scroll{overflow-x:auto;border:1px solid var(--line);}
+
+  select.status{
+    font-family:'Courier New',monospace;font-size:11px;padding:3px 4px;width:100%;border:1px solid var(--line);border-radius:2px;
+  }
+  select.status.st-tersedia{background:#eef6ef;}
+  select.status.st-cuti,select.status.st-st{background:var(--warn-bg);}
+  select.status.st-wfh{background:#fdf3d9;}
+  select.status.st-libur{background:#e3e3e3;}
+
+  .kat-pill{
+    display:inline-block;font-family:'Courier New',monospace;font-size:10.5px;
+    padding:2px 7px;border-radius:10px;letter-spacing:.02em;
+  }
+  .kat-penyuluh{background:#e7dcc4;color:#6b4e14;}
+  .kat-pelayanan{background:#d7e6d9;color:#295234;}
+  .kat-other{background:#dbe4f1;color:#213b66;}
+
+  .day-block h3{
+    margin:18px 0 8px;font-size:14px;color:var(--navy-900);font-family:'Courier New',monospace;
+    display:flex;align-items:center;gap:10px;
+  }
+  .day-block h3 .badge{
+    font-size:10px;background:var(--navy-100);color:var(--navy-800);padding:2px 8px;border-radius:10px;
+  }
+  .slot-cell{min-width:150px;}
+  .slot-cell select{width:100%;font-family:Georgia,serif;font-size:12.5px;padding:5px 6px;border:1px solid var(--line);border-radius:2px;}
+  .slot-cell select.warn-slot{border-color:var(--warn);background:var(--warn-bg);}
+  .slot-empty{color:#b9483a;font-style:italic;}
+
+  .warn-note{
+    display:flex;gap:8px;align-items:flex-start;background:var(--warn-bg);border:1px solid #e3c1a9;
+    color:var(--warn);padding:8px 10px;border-radius:2px;font-size:12px;margin-top:10px;
+  }
+  .ok-note{
+    display:flex;gap:8px;align-items:flex-start;background:var(--ok-bg);border:1px solid #bfe0cd;
+    color:var(--ok);padding:8px 10px;border-radius:2px;font-size:12px;margin-top:10px;
+  }
+
+  .output-table th{background:var(--navy-900);}
+  .output-table td.day-cell{font-weight:700;background:var(--navy-100);color:var(--navy-900);}
+  .output-table td.sesi-cell{font-family:'Courier New',monospace;font-size:11.5px;color:var(--ink-soft);}
+  .output-table tr.libur td{background:#20232b;color:#20232b;}
+  .output-table tr.libur td.day-cell{color:#fff;}
+
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-soft);margin-top:8px;font-family:'Courier New',monospace;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .swatch{width:11px;height:11px;border-radius:2px;display:inline-block;border:1px solid rgba(0,0,0,.15);}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;}
+  .empty-state{color:var(--ink-soft);font-size:13px;font-style:italic;padding:20px;text-align:center;}
+  .footnote{font-size:11.5px;color:var(--ink-soft);margin-top:10px;line-height:1.6;}
+  input[type=number]{width:60px;}
+  .rule-list{font-size:12.5px;color:var(--ink-soft);line-height:1.7;margin:0;padding-left:18px;}
+  .del-btn{color:var(--warn);cursor:pointer;font-family:'Courier New',monospace;font-size:11px;background:none;border:none;text-decoration:underline;padding:0;}
+
+  #lockScreen{
+    position:fixed;inset:0;background:linear-gradient(135deg,var(--navy-950),var(--navy-800));
+    display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;
+  }
+  #lockScreen .lock-box{
+    background:var(--paper-2);border:1px solid var(--line);border-radius:2px;padding:32px 28px;
+    max-width:360px;width:100%;box-shadow:0 8px 30px rgba(0,0,0,.35);
+  }
+  #lockScreen .lock-box h2{margin:0 0 4px;font-size:17px;color:var(--navy-900);font-weight:400;}
+  #lockScreen .lock-box p.sub{margin:0 0 18px;font-size:12px;color:var(--ink-soft);}
+  #lockScreen .lock-box label{display:block;font-family:'Courier New',monospace;font-size:11.5px;color:var(--ink-soft);margin-bottom:4px;}
+  #lockScreen .lock-box input{
+    width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:2px;font-family:Georgia,serif;
+    font-size:14px;margin-bottom:14px;box-sizing:border-box;
+  }
+  #lockScreen .lock-box .btn{width:100%;}
+  #lockScreen .lock-err{color:var(--warn);font-size:12px;margin:-8px 0 12px;min-height:14px;}
+  #lockScreen .lock-note{font-size:11px;color:var(--ink-soft);margin-top:14px;line-height:1.5;border-top:1px solid var(--line);padding-top:12px;}
+  #appContent{display:none;}
+</style>
+</head>
+<body>
+
+<div id="lockScreen">
+  <div class="lock-box">
+    <h2 id="lockTitle">Masuk ke Aplikasi</h2>
+    <p class="sub" id="lockSub">Masukkan passcode untuk mengakses penyusun jadwal piket.</p>
+    <form id="lockForm">
+      <label for="lockName">Nama (opsional, untuk catatan aktivitas)</label>
+      <input type="text" id="lockName" placeholder="mis. Yang mulia raja" autocomplete="off">
+      <label for="lockPass" id="lockPassLabel">Passcode</label>
+      <input type="password" id="lockPass" autocomplete="off">
+      <label for="lockPass2" id="lockPass2Wrap" style="display:none;">Ulangi Passcode</label>
+      <input type="password" id="lockPass2" autocomplete="off" style="display:none;">
+      <div class="lock-err" id="lockErr"></div>
+      <button type="submit" class="btn" id="lockSubmitBtn">Masuk</button>
+    </form>
+    <div class="lock-note">Passcode ini hanya pencegah akses tidak sengaja/orang luar, bukan enkripsi tingkat tinggi — jangan gunakan untuk data yang sangat rahasia.</div>
+  </div>
+</div>
+
+<div id="appContent">
+<header class="app">
+  <div class="eyebrow">KPP Pratama Karawang &middot; Seksi Pelayanan</div>
+  <h1>Penyusun Jadwal Piket Helpdesk Coretax</h1>
+  <p>Alat bantu penyusunan jadwal piket mingguan secara terprogram: kuota per kategori pegawai, ketersediaan (cuti/ST/WFH), dan peringatan piket berturut-turut otomatis dihitungkan.</p>
+  <button onclick="changePasscode()" style="margin-top:10px;background:transparent;border:1px solid #4a5a80;color:#b9c4dc;font-family:'Courier New',monospace;font-size:10.5px;padding:5px 10px;border-radius:2px;cursor:pointer;text-transform:uppercase;letter-spacing:.03em;">Ganti Passcode</button>
+</header>
+
+<div class="wrap">
+
+  <section class="card">
+    <div class="card-head">
+      <h2><span class="num">01</span>ATURAN YANG DITERAPKAN</h2>
+      <span class="hint">Dapat disesuaikan di kode bila kebijakan berubah</span>
+    </div>
+    <div class="card-body">
+      <ol class="rule-list">
+        <li>Asisten/Penyuluh Pajak: kuota 2x dan 3x piket per minggu, bergantian tiap minggu antar-personil dalam kelompok tersebut.</li>
+        <li>Pelaksana Seksi Pelayanan: wajib piket 1x setiap minggu.</li>
+        <li>Pegawai selain dua kategori di atas: piket setiap 2–3 minggu sekali, diprioritaskan yang paling lama tidak piket.</li>
+        <li>Ketersediaan pegawai (Cuti / ST-Dinas Luar / WFH / Libur) otomatis mengecualikan pegawai dari piket pada hari tersebut.</li>
+        <li>Jumlah petugas: Senin 5–6 orang; hari lain 5 orang (3 Pagi + 2 Siang), dapat diubah manual per hari.</li>
+        <li>Bila pegawai non-Pelayanan/non-Penyuluh piket 2 minggu berturut-turut, sistem memberi peringatan; dapat tetap dipilih dan otomatis "dikarantina" (dilewati) 2 minggu berikutnya.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2><span class="num">02</span>DAFTAR PEGAWAI</h2>
+      <span class="hint" id="empCount"></span>
+    </div>
+    <div class="card-body">
+      <div class="toolbar" style="margin-bottom:12px;">
+        <button class="btn secondary small" id="addEmpBtn">+ Tambah Pegawai</button>
+        <button class="btn ghost small" id="resetEmpBtn">Muat Ulang Data Awal</button>
+      </div>
+      <div class="tbl-scroll">
+        <table id="empTable">
+          <thead>
+            <tr>
+              <th style="min-width:40px;">No</th>
+              <th style="min-width:180px;">Nama</th>
+              <th style="min-width:190px;">Jabatan</th>
+              <th style="min-width:220px;">Unit Organisasi</th>
+              <th style="min-width:130px;">Kategori Piket</th>
+              <th style="min-width:60px;">Aktif</th>
+              <th style="min-width:110px;">Riwayat</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="empBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2><span class="num">03</span>MINGGU YANG DIJADWALKAN</h2>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="field">
+          <label for="weekStart">Tanggal Senin (awal minggu)</label>
+          <input type="date" id="weekStart">
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <button class="btn secondary small" id="loadWeekBtn">Muat / Buat Minggu Ini</button>
+        </div>
+      </div>
+      <div id="dayConfigWrap" style="margin-top:16px;"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2><span class="num">04</span>KETERSEDIAAN PEGAWAI MINGGU INI</h2>
+      <span class="hint">Tersedia / Cuti / ST-Dinas Luar / WFH / Libur</span>
+    </div>
+    <div class="card-body">
+      <div class="tbl-scroll">
+        <table id="availTable">
+          <thead><tr id="availHeadRow"></tr></thead>
+          <tbody id="availBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2><span class="num">05</span>SUSUN JADWAL</h2>
+    </div>
+    <div class="card-body">
+      <h3 style="margin:0 0 8px;font-size:13px;font-family:'Courier New',monospace;color:var(--navy-900);">Status Rotasi Penyuluh</h3>
+      <div id="penyuluhStatusWrap" class="tbl-scroll" style="margin-bottom:16px;"></div>
+      <div class="toolbar">
+        <button class="btn" id="genBtn">Buat Jadwal Otomatis</button>
+        <button class="btn secondary" id="saveBtn">Simpan Jadwal &amp; Perbarui Riwayat</button>
+        <button class="btn ghost" id="printBtn">Cetak / PDF</button>
+        <button class="btn ghost" id="exportWordBtn">Ekspor ke Word (.doc)</button>
+      </div>
+      <div id="warnBox"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2><span class="num">06</span>HASIL &mdash; JADWAL PETUGAS HELPDESK CORETAX</h2>
+    </div>
+    <div class="card-body">
+      <div id="scheduleTitle" style="font-family:'Courier New',monospace;font-weight:700;text-align:center;color:var(--navy-900);margin-bottom:10px;"></div>
+      <div class="tbl-scroll">
+        <table class="output-table" id="outputTable"></table>
+      </div>
+      <div class="legend">
+        <span><span class="swatch" style="background:var(--kat-penyuluh, #e7dcc4);"></span>Penyuluh</span>
+        <span><span class="swatch" style="background:#d7e6d9;"></span>Pelayanan</span>
+        <span><span class="swatch" style="background:#dbe4f1;"></span>Lainnya</span>
+        <span>⚠️ = piket minggu lalu (perlu konfirmasi)</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2><span class="num">07</span>IMPOR RIWAYAT MINGGU LAMPAU</h2>
+      <span class="hint">Riwayat minggu 17/08 &amp; 24/08 sudah otomatis dimuat. Lengkapi minggu lain di sini bila perlu.</span>
+    </div>
+    <div class="card-body">
+      <p class="footnote" style="margin-top:0;">Gunakan ini untuk mencatat minggu-minggu piket yang sudah lewat (misalnya rekap minggu 10–14) agar prioritas "belum piket paling lama" pada bagian 06 semakin akurat. Tandai <span class="util">P</span>/<span class="util">S</span> jika pegawai piket hari itu, <span class="util">x</span>/<span class="util">WFH</span> jika tidak tersedia, atau centang "libur penuh" bila satu minggu penuh tidak tersedia (cuti/mutasi).</p>
+      <div class="row" style="margin-bottom:12px;">
+        <div class="field">
+          <label for="histWeekStart">Tanggal Senin minggu yang dicatat</label>
+          <input type="date" id="histWeekStart">
+        </div>
+        <div class="field"><label>&nbsp;</label><button class="btn secondary small" id="loadHistImportBtn">Muat Formulir</button></div>
+      </div>
+      <div class="tbl-scroll">
+        <table id="histImportTable">
+          <thead><tr id="histImportHead"></tr></thead>
+          <tbody id="histImportBody"></tbody>
+        </table>
+      </div>
+      <div class="toolbar" style="margin-top:12px;">
+        <button class="btn secondary" id="saveHistImportBtn">Simpan Sebagai Riwayat</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2><span class="num">08</span>RIWAYAT &amp; STATUS KARANTINA</h2>
+    </div>
+    <div class="card-body">
+      <div class="tbl-scroll">
+        <table id="histTable">
+          <thead><tr><th>Nama</th><th>Kategori</th><th>Total Piket</th><th>Piket Terakhir</th><th>Status Minggu Ini</th></tr></thead>
+          <tbody id="histBody"></tbody>
+        </table>
+      </div>
+      <p class="footnote">Riwayat disimpan otomatis di perangkat ini setiap kali jadwal disimpan (tombol "Simpan Jadwal"). Klik sel petugas pada tabel hasil untuk mengganti petugas secara manual — pilihan yang ditandai ⚠️ berarti pegawai tersebut piket minggu lalu.</p>
+    </div>
+  </section>
+
+</div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const DAYS = ["Senin","Selasa","Rabu","Kamis","Jumat"];
+  const STATUS_OPTS = [
+    {v:"tersedia", l:"Tersedia"},
+    {v:"cuti", l:"Cuti"},
+    {v:"st", l:"ST/Dinas Luar"},
+    {v:"wfh", l:"WFH"},
+    {v:"libur", l:"Libur"}
+  ];
+
+  const DEFAULT_EMPLOYEES = [
+    ["Yusuf Muslim","Asisten Penyuluh Pajak Terampil","Seksi Pelayanan","penyuluh"],
+    ["Ilman Abdul Ghani","Asisten Penyuluh Pajak Terampil","Seksi Pelayanan","penyuluh"],
+    ["Joko Purwanto","Asisten Penyuluh Pajak Mahir","Seksi Pelayanan","penyuluh"],
+    ["Muhammad Abdan Fadhlissalam","Asisten Penyuluh Pajak Terampil","Seksi Pelayanan","penyuluh"],
+    ["Zahra Sofil Aula","Pelaksana","Seksi Pemeriksaan, Penilaian, dan Penagihan","other"],
+    ["Adiemas Bagawan Wiyasa","Pelaksana","Seksi Pengawasan III","other"],
+    ["Resa Amalia Ardina","Pelaksana","Seksi Pelayanan","pelayanan"],
+    ["Reky Erdianto","Pelaksana","Seksi Pelayanan","pelayanan"],
+    ["Mahendra Arya Wardhana","Pelaksana","Seksi Penjaminan Kualitas Data","other"],
+    ["Kharisma Rahman","Pelaksana","Subbagian Umum dan Kepatuhan Internal","other"],
+    ["Eky Raka Pratama","Account Representative","Seksi Pengawasan I","other"],
+    ["I Made Yogi Pradnyana Sugitha","Account Representative","Seksi Pengawasan I","other"],
+    ["Dhella Laksana","Pelaksana","Subbagian Umum dan Kepatuhan Internal","other"],
+    ["Chris Thapa Nugraha","Account Representative","Seksi Pengawasan IV","other"],
+    ["Anissa Fiatin","Account Representative","Seksi Pengawasan V","other"],
+    ["Dimas Eka Pramudito","Pemeriksa Pajak Pelaksana","","other"],
+    ["Andi Madukelleng","Pemeriksa Pajak Pelaksana","","other"],
+    ["Hari Budi Utomo","Account Representative","Seksi Pengawasan VI","other"],
+    ["Nanang Indriyono","Pemeriksa Pajak Muda","","other"],
+    ["Yophi Tautologi","Pelaksana","Seksi Pengawasan V","other"],
+    ["Taufiq Alfiansyah","Pelaksana","Seksi Pengawasan II","other"],
+    ["Ryan Arie Sukmana","Account Representative","Seksi Pengawasan I","other"],
+    ["Rusdiyanto","Account Representative","Seksi Pengawasan II","other"],
+    ["Dito Fandy Asprinanto","Pemeriksa Pajak Pertama","","other"],
+    ["Rizqi Nur","Pelaksana","Seksi Pemeriksaan, Penilaian, dan Penagihan","other"],
+    ["Tatak Wis Alfian","Account Representative","Seksi Pengawasan II","other"],
+    ["Putu Arya Marlon Suputra","Account Representative","Seksi Pengawasan III","other"],
+    ["Riky Tri Wahyudi","Account Representative","Seksi Pengawasan III","other"],
+    ["Hendri Unggul Sudibyo","Account Representative","Seksi Pengawasan III","other"],
+    ["Cindy Resty Januar","Account Representative","Seksi Pengawasan IV","other"],
+    ["Ruswanto","Pemeriksa Pajak Pelaksana","","other"],
+    ["Rian Lingga Purnama","Account Representative","Seksi Pengawasan V","other"],
+    ["Mela Tiara Ryandisa","Account Representative","Seksi Pengawasan VI","other"],
+    ["Fahrul Muzakky","Pelaksana","Subbagian Umum dan Kepatuhan Internal","other"],
+    ["Yurinka Arinlsis","Account Representative","Seksi Pengawasan VI","other"],
+    ["Kunti Istiqoomatul Aziizah","Pelaksana","Seksi Penjaminan Kualitas Data","other"],
+    ["Arsi Arum Widhiati","Pelaksana","Seksi Penjaminan Kualitas Data","other"]
+  ].map((r,i)=>({id:"e"+(i+1), nama:r[0], jabatan:r[1], unit:r[2], kategori:r[3], aktif:true}));
+
+  // Riwayat awal hasil pembacaan dokumen piket manual:
+  // - Minggu 21 (Senin 17/08/2026) diambil dari kolom terakhir rekap mingguan.
+  // - Minggu berjalan (Senin 24/08/2026) diambil dari rekap "24-28 Agustus 2026".
+  // total = jumlah minggu pegawai tsb tercatat piket (bukan jumlah hari), lastWeek = piket paling akhir.
+  const DEFAULT_HISTORY = {
+    e1:{total:2,lastWeek:"2026-08-31",quarantineUntil:null,penyuluhQuotaLastWeek:2,penyuluhQuotaWeek:"2026-08-31"},   // Yusuf Muslim
+    e2:{total:3,lastWeek:"2026-08-31",quarantineUntil:null,penyuluhQuotaLastWeek:3,penyuluhQuotaWeek:"2026-08-31"},   // Ilman Abdul Ghani
+    e3:{total:2,lastWeek:"2026-08-31",quarantineUntil:null,penyuluhQuotaLastWeek:3,penyuluhQuotaWeek:"2026-08-31"},   // Joko Purwanto
+    e4:{total:3,lastWeek:"2026-08-31",quarantineUntil:null,penyuluhQuotaLastWeek:2,penyuluhQuotaWeek:"2026-08-31"},   // Muhammad Abdan Fadhlissalam
+    e5:{total:1,lastWeek:"2026-08-24",quarantineUntil:null},   // Zahra Sofil Aula
+    e6:{total:1,lastWeek:"2026-08-24",quarantineUntil:null},   // Adiemas Bagawan Wiyasa
+    e7:{total:2,lastWeek:"2026-08-31",quarantineUntil:null},   // Resa Amalia Ardina
+    e8:{total:0,lastWeek:null,quarantineUntil:null},           // Reky Erdianto (tidak tersedia beberapa minggu terakhir)
+    e9:{total:1,lastWeek:"2026-08-24",quarantineUntil:null},   // Mahendra Arya Wardhana
+    e10:{total:1,lastWeek:"2026-08-24",quarantineUntil:null},  // Kharisma Rahman
+    e11:{total:1,lastWeek:"2026-08-31",quarantineUntil:null},  // Eky Raka Pratama
+    e12:{total:2,lastWeek:"2026-08-31",quarantineUntil:null},  // I Made Yogi Pradnyana Sugitha
+    e13:{total:0,lastWeek:null,quarantineUntil:null},          // Dhella Laksana
+    e14:{total:1,lastWeek:"2026-08-24",quarantineUntil:null},  // Chris Thapa Nugraha
+    e15:{total:1,lastWeek:"2026-08-24",quarantineUntil:null},  // Anissa Fiatin
+    e16:{total:0,lastWeek:null,quarantineUntil:null},          // Dimas Eka Pramudito
+    e17:{total:1,lastWeek:"2026-08-31",quarantineUntil:null},  // Andi Madukelleng
+    e18:{total:1,lastWeek:"2026-08-31",quarantineUntil:null},  // Hari Budi Utomo
+    e19:{total:1,lastWeek:"2026-08-31",quarantineUntil:null},  // Nanang Indriyono
+    e20:{total:1,lastWeek:"2026-08-31",quarantineUntil:null},  // Yophi Tautologi
+    e21:{total:1,lastWeek:"2026-08-31",quarantineUntil:null},  // Taufiq Alfiansyah
+    e22:{total:1,lastWeek:"2026-08-31",quarantineUntil:null},  // Ryan Arie Sukmana
+    e23:{total:1,lastWeek:"2026-08-31",quarantineUntil:null},  // Rusdiyanto
+    e24:{total:1,lastWeek:"2026-08-24",quarantineUntil:null},  // Dito Fandy Asprinanto
+    e25:{total:1,lastWeek:"2026-08-31",quarantineUntil:null},  // Rizqi Nur
+    e26:{total:1,lastWeek:"2026-08-31",quarantineUntil:null},  // Tatak Wis Alfian
+    e27:{total:1,lastWeek:"2026-08-31",quarantineUntil:null},  // Putu Arya Marlon Suputra
+    e28:{total:1,lastWeek:"2026-08-24",quarantineUntil:null},  // Riky Tri Wahyudi
+    e29:{total:1,lastWeek:"2026-08-17",quarantineUntil:null},  // Hendri Unggul Sudibyo
+    e30:{total:1,lastWeek:"2026-08-31",quarantineUntil:null},  // Cindy Resty Januar
+    e31:{total:1,lastWeek:"2026-08-24",quarantineUntil:null},  // Ruswanto
+    e32:{total:1,lastWeek:"2026-08-17",quarantineUntil:null},  // Rian Lingga Purnama
+    e33:{total:1,lastWeek:"2026-08-31",quarantineUntil:null},  // Mela Tiara Ryandisa
+    e34:{total:1,lastWeek:"2026-08-31",quarantineUntil:null},  // Fahrul Muzakky
+    e35:{total:0,lastWeek:null,quarantineUntil:null},          // Yurinka Arinlsis
+    e36:{total:1,lastWeek:"2026-08-24",quarantineUntil:null},  // Kunti Istiqoomatul Aziizah
+    e37:{total:1,lastWeek:"2026-08-24",quarantineUntil:null}   // Arsi Arum Widhiati
+  };
+
+  // Jadwal resmi (sudah ditetapkan lewat Nota Dinas) untuk minggu-minggu tertentu.
+  // Dimuat otomatis saat minggu tsb belum ada di penyimpanan lokal pengguna.
+  const WEEK_SEEDS = {
+    "2026-08-31": {
+      dayConfig: {
+        Senin:{libur:false,pagi:3,siang:3},
+        Selasa:{libur:false,pagi:3,siang:2},
+        Rabu:{libur:false,pagi:3,siang:2},
+        Kamis:{libur:false,pagi:3,siang:2},
+        Jumat:{libur:false,pagi:3,siang:2}
+      },
+      schedule: {
+        Senin:{pagi:["e4","e11","e20"], siang:["e2","e26","e34"], koordinator:"Mengikuti Jadwal Satgas SPT Tahunan"},
+        Selasa:{pagi:["e1","e7","e4"], siang:["e2","e21"], koordinator:"Mengikuti Jadwal Satgas SPT Tahunan"},
+        Rabu:{pagi:["e2","e17","e22"], siang:["e3","e27"], koordinator:"Mengikuti Jadwal Satgas SPT Tahunan"},
+        Kamis:{pagi:["e30","e19","e25"], siang:["e3","e12"], koordinator:"Mengikuti Jadwal Satgas SPT Tahunan"},
+        Jumat:{pagi:["e3","e18","e23"], siang:["e1","e33"], koordinator:"Mengikuti Jadwal Satgas SPT Tahunan"}
+      }
+    }
+  };
+
+  let state = {
+    employees: [],
+    history: {},      // id -> {total, lastWeek, quarantineUntil}
+    penyuluhToggle: false,
+    weekKey: null,
+    dayConfig: {},     // day -> {libur:bool, pagi:n, siang:n}
+    availability: {},  // empId -> day -> status
+    schedule: {}        // day -> {pagi:[empId...], siang:[empId...]}
+  };
+
+  // ---------- storage helpers ----------
+  async function saveRoot(){
+    try{
+      await window.storage.set("roster-root", JSON.stringify({
+        employees: state.employees, history: state.history, penyuluhToggle: state.penyuluhToggle
+      }));
+    }catch(e){console.error(e);}
+  }
+  async function loadRoot(){
+    try{
+      const r = await window.storage.get("roster-root");
+      if(r && r.value){
+        const d = JSON.parse(r.value);
+        state.employees = d.employees && d.employees.length ? d.employees : DEFAULT_EMPLOYEES.slice();
+        state.history = d.history || {};
+        state.penyuluhToggle = !!d.penyuluhToggle;
+      } else {
+        state.employees = DEFAULT_EMPLOYEES.slice();
+        state.history = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
+      }
+    }catch(e){
+      state.employees = DEFAULT_EMPLOYEES.slice();
+      state.history = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
+    }
+  }
+  async function saveWeek(){
+    if(!state.weekKey) return;
+    try{
+      await window.storage.set("week-"+state.weekKey, JSON.stringify({
+        dayConfig: state.dayConfig, availability: state.availability, schedule: state.schedule
+      }));
+    }catch(e){console.error(e);}
+  }
+  async function loadWeek(weekKey){
+    try{
+      const r = await window.storage.get("week-"+weekKey);
+      if(r && r.value) return JSON.parse(r.value);
+    }catch(e){ /* not found */ }
+    return null;
+  }
+
+  // ---------- utility ----------
+  function uid(){ return "e"+Math.random().toString(36).slice(2,9); }
+  function addDays(dateStr, n){
+    const [y,m,d] = dateStr.split("-").map(Number);
+    const dt = new Date(Date.UTC(y, m-1, d));
+    dt.setUTCDate(dt.getUTCDate()+n);
+    return dt.toISOString().slice(0,10);
+  }
+  function fmtDate(dateStr){
+    const [y,m,d] = dateStr.split("-").map(Number);
+    const dt = new Date(Date.UTC(y, m-1, d));
+    return dt.toLocaleDateString("id-ID",{day:"2-digit",month:"2-digit",year:"2-digit",timeZone:"UTC"});
+  }
+  function weekKeyFromStart(dateStr){ return dateStr; }
+  function prevWeekKey(weekKey){ return addDays(weekKey, -7); }
+
+  function defaultDayConfig(){
+    const cfg = {};
+    DAYS.forEach((d,i)=>{
+      cfg[d] = { libur:false, pagi:3, siang: (i===0?2:2) };
+    });
+    return cfg;
+  }
+
+  // ---------- employee table render ----------
+  function renderEmployees(){
+    const body = document.getElementById("empBody");
+    body.innerHTML = "";
+    document.getElementById("empCount").textContent = state.employees.filter(e=>e.aktif).length + " aktif / " + state.employees.length + " total";
+    state.employees.forEach((emp, idx)=>{
+      const h = state.history[emp.id] || {total:0,lastWeek:null,quarantineUntil:null};
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="util">${idx+1}</td>
+        <td><input type="text" data-f="nama" value="${escAttr(emp.nama)}" style="width:100%;border:none;background:transparent;font-family:Georgia,serif;"></td>
+        <td><input type="text" data-f="jabatan" value="${escAttr(emp.jabatan)}" style="width:100%;border:none;background:transparent;font-family:Georgia,serif;font-size:12.5px;"></td>
+        <td><input type="text" data-f="unit" value="${escAttr(emp.unit)}" style="width:100%;border:none;background:transparent;font-family:Georgia,serif;font-size:12.5px;"></td>
+        <td>
+          <select data-f="kategori">
+            <option value="penyuluh" ${emp.kategori==="penyuluh"?"selected":""}>Penyuluh (2-3x/mgg)</option>
+            <option value="pelayanan" ${emp.kategori==="pelayanan"?"selected":""}>Pelayanan (1x/mgg)</option>
+            <option value="other" ${emp.kategori==="other"?"selected":""}>Lainnya (2-3 mgg)</option>
+          </select>
+        </td>
+        <td style="text-align:center;"><input type="checkbox" data-f="aktif" ${emp.aktif?"checked":""}></td>
+        <td class="util" style="font-size:11px;color:var(--ink-soft);">${h.total}x &middot; ${h.lastWeek?fmtDate(h.lastWeek):"-"}</td>
+        <td><button class="del-btn" data-del="${emp.id}">hapus</button></td>
+      `;
+      body.appendChild(tr);
+      tr.querySelectorAll("[data-f]").forEach(inp=>{
+        inp.addEventListener("change", ()=>{
+          const f = inp.getAttribute("data-f");
+          emp[f] = f==="aktif" ? inp.checked : inp.value;
+          renderAvailability();
+          saveRoot();
+        });
+      });
+      tr.querySelector("[data-del]").addEventListener("click", ()=>{
+        state.employees = state.employees.filter(e=>e.id!==emp.id);
+        delete state.history[emp.id];
+        renderEmployees(); renderAvailability(); saveRoot();
+      });
+    });
+  }
+  function escAttr(s){ return (s||"").replace(/"/g,"&quot;"); }
+
+  document.getElementById("addEmpBtn").addEventListener("click", ()=>{
+    state.employees.push({id:uid(), nama:"Pegawai Baru", jabatan:"", unit:"", kategori:"other", aktif:true});
+    renderEmployees(); renderAvailability(); saveRoot();
+  });
+  document.getElementById("resetEmpBtn").addEventListener("click", ()=>{
+    if(!confirm("Muat ulang daftar pegawai ke data awal? Perubahan manual pada daftar pegawai akan hilang (riwayat piket tetap tersimpan).")) return;
+    state.employees = DEFAULT_EMPLOYEES.slice();
+    renderEmployees(); renderAvailability(); saveRoot();
+  });
+
+  // ---------- day config ----------
+  function renderDayConfig(){
+    const wrap = document.getElementById("dayConfigWrap");
+    wrap.innerHTML = "";
+    DAYS.forEach(d=>{
+      const cfg = state.dayConfig[d];
+      const row = document.createElement("div");
+      row.className = "row";
+      row.style.marginBottom = "8px";
+      row.innerHTML = `
+        <div class="field" style="min-width:70px;"><label>&nbsp;</label><strong style="font-family:'Courier New',monospace;font-size:13px;">${d}</strong></div>
+        <div class="field"><label><input type="checkbox" ${cfg.libur?"checked":""} data-day="${d}" data-k="libur"> Hari libur</label></div>
+        <div class="field"><label>Slot Pagi</label><input type="number" min="0" max="6" value="${cfg.pagi}" data-day="${d}" data-k="pagi"></div>
+        <div class="field"><label>Slot Siang</label><input type="number" min="0" max="6" value="${cfg.siang}" data-day="${d}" data-k="siang"></div>
+        <div class="field"><label>&nbsp;</label><span class="util" style="font-size:11px;color:var(--ink-soft);">total ${cfg.pagi+cfg.siang} org</span></div>
+      `;
+      wrap.appendChild(row);
+    });
+    wrap.querySelectorAll("[data-day]").forEach(inp=>{
+      inp.addEventListener("change", ()=>{
+        const d = inp.getAttribute("data-day"), k = inp.getAttribute("data-k");
+        if(k==="libur") state.dayConfig[d].libur = inp.checked;
+        else state.dayConfig[d][k] = parseInt(inp.value||"0",10);
+        renderDayConfig();
+      });
+    });
+  }
+
+  // ---------- availability table ----------
+  function renderAvailability(){
+    const headRow = document.getElementById("availHeadRow");
+    headRow.innerHTML = "<th style='min-width:170px;'>Nama</th>" + DAYS.map(d=>`<th>${d}</th>`).join("");
+    const body = document.getElementById("availBody");
+    body.innerHTML = "";
+    state.employees.filter(e=>e.aktif).forEach(emp=>{
+      if(!state.availability[emp.id]) state.availability[emp.id] = {};
+      const tr = document.createElement("tr");
+      let cells = `<td>${emp.nama} <span class="kat-pill kat-${emp.kategori}">${kategoriLabel(emp.kategori)}</span></td>`;
+      DAYS.forEach(d=>{
+        const cur = state.availability[emp.id][d] || "tersedia";
+        cells += `<td><select class="status st-${cur}" data-emp="${emp.id}" data-day="${d}">
+          ${STATUS_OPTS.map(o=>`<option value="${o.v}" ${o.v===cur?"selected":""}>${o.l}</option>`).join("")}
+        </select></td>`;
+      });
+      tr.innerHTML = cells;
+      body.appendChild(tr);
+    });
+    body.querySelectorAll("select.status").forEach(sel=>{
+      sel.addEventListener("change", ()=>{
+        const emp = sel.getAttribute("data-emp"), day = sel.getAttribute("data-day");
+        state.availability[emp][day] = sel.value;
+        sel.className = "status st-"+sel.value;
+      });
+    });
+  }
+  function kategoriLabel(k){ return k==="penyuluh"?"Penyuluh":k==="pelayanan"?"Pelayanan":"Lainnya"; }
+
+  // ---------- rotasi kuota penyuluh (berbasis riwayat, bukan toggle tetap) ----------
+  // Prioritas mendapat 3x minggu ini: yang MINGGU LALU TIDAK piket 3x (agar tidak 3x dua minggu berturut-turut).
+  function computeHeavyPenyuluhSet(penyuluhList){
+    const heavyCount = Math.floor(penyuluhList.length/2) + (penyuluhList.length%2);
+    const sorted = penyuluhList.slice().sort((a,b)=>{
+      const ha = state.history[a.id] || {};
+      const hb = state.history[b.id] || {};
+      const aWas3 = ha.penyuluhQuotaLastWeek===3 ? 1 : 0;
+      const bWas3 = hb.penyuluhQuotaLastWeek===3 ? 1 : 0;
+      if(aWas3 !== bWas3) return aWas3 - bWas3; // yang TIDAK 3x minggu lalu didahulukan jadi 3x minggu ini
+      return (ha.total||0) - (hb.total||0);
+    });
+    return new Set(sorted.slice(0,heavyCount).map(e=>e.id));
+  }
+  function renderPenyuluhStatus(){
+    const wrap = document.getElementById("penyuluhStatusWrap");
+    if(!wrap) return;
+    const penyuluh = state.employees.filter(e=>e.aktif && e.kategori==="penyuluh");
+    if(penyuluh.length===0){ wrap.innerHTML = `<p class="empty-state">Belum ada pegawai berkategori Penyuluh.</p>`; return; }
+    const heavySet = computeHeavyPenyuluhSet(penyuluh);
+    let html = `<table><thead><tr><th>Nama</th><th>Kuota minggu lalu</th><th>Rencana kuota minggu ini</th></tr></thead><tbody>`;
+    penyuluh.forEach(emp=>{
+      const h = state.history[emp.id] || {};
+      const lastQ = (h.penyuluhQuotaLastWeek===undefined || h.penyuluhQuotaLastWeek===null) ? "belum ada data" : `${h.penyuluhQuotaLastWeek}x`;
+      const planned = heavySet.has(emp.id) ? "3x" : "2x";
+      html += `<tr><td>${emp.nama}</td><td class="util">${lastQ}</td><td class="util"><strong>${planned}</strong></td></tr>`;
+    });
+    html += `</tbody></table>`;
+    wrap.innerHTML = html;
+  }
+  function isAvailable(empId, day){
+    if(state.dayConfig[day].libur) return false;
+    const st = (state.availability[empId] && state.availability[empId][day]) || "tersedia";
+    return st === "tersedia";
+  }
+
+  function generateSchedule(warnings){
+    const sched = {};
+    DAYS.forEach(d=> sched[d] = {pagi:[], siang:[]});
+    if(DAYS.every(d=>state.dayConfig[d].libur)) return sched;
+
+    const usedToday = {}; DAYS.forEach(d=>usedToday[d]=new Set());
+    const penyuluhPlaced = {}; DAYS.forEach(d=>penyuluhPlaced[d]={pagi:false, siang:false});
+    function openSlot(day){
+      const c = state.dayConfig[day];
+      if(sched[day].pagi.length < c.pagi) return "pagi";
+      if(sched[day].siang.length < c.siang) return "siang";
+      return null;
+    }
+    // Untuk penyuluh: setiap sesi (Pagi / Siang) maksimal diisi 1 orang penyuluh.
+    function openSlotForPenyuluh(day){
+      const c = state.dayConfig[day];
+      if(sched[day].pagi.length < c.pagi && !penyuluhPlaced[day].pagi) return "pagi";
+      if(sched[day].siang.length < c.siang && !penyuluhPlaced[day].siang) return "siang";
+      return null;
+    }
+    function place(empId, day, sesi, isPenyuluh){
+      sched[day][sesi].push(empId);
+      usedToday[day].add(empId);
+      if(isPenyuluh) penyuluhPlaced[day][sesi] = true;
+    }
+    function daysAvailableFor(empId){
+      return DAYS.filter(d=>!state.dayConfig[d].libur && isAvailable(empId,d) && !usedToday[d].has(empId));
+    }
+
+    // --- Penyuluh ---
+    const penyuluh = state.employees.filter(e=>e.aktif && e.kategori==="penyuluh");
+    const heavySet = computeHeavyPenyuluhSet(penyuluh);
+    penyuluh.forEach(emp=>{
+      const quota = heavySet.has(emp.id) ? 3 : 2;
+      let placed = 0;
+      const avail = daysAvailableFor(emp.id);
+      for(const day of avail){
+        if(placed>=quota) break;
+        const slot = openSlotForPenyuluh(day);
+        if(!slot) continue;
+        place(emp.id, day, slot, true);
+        placed++;
+      }
+      if(!state.history[emp.id]) state.history[emp.id] = {total:0,lastWeek:null,quarantineUntil:null};
+      state.history[emp.id]._plannedPenyuluhQuota = quota;
+      state.history[emp.id]._actualPenyuluhCount = placed;
+      if(placed < quota){
+        warnings.push(`${emp.nama} (Penyuluh) hanya dapat ditempatkan ${placed}/${quota}x karena keterbatasan ketersediaan/slot atau sesi sudah terisi penyuluh lain.`);
+      }
+    });
+
+    // --- Pelayanan (1x/minggu) ---
+    const pelayanan = state.employees.filter(e=>e.aktif && e.kategori==="pelayanan");
+    pelayanan.forEach(emp=>{
+      const avail = daysAvailableFor(emp.id).filter(d=>openSlot(d));
+      if(avail.length===0){
+        warnings.push(`${emp.nama} (Pelayanan) tidak dapat dijadwalkan minggu ini — tidak ada hari tersedia.`);
+        return;
+      }
+      // prefer day with least crowding
+      avail.sort((a,b)=> (sched[a].pagi.length+sched[a].siang.length) - (sched[b].pagi.length+sched[b].siang.length));
+      const day = avail[0];
+      place(emp.id, day, openSlot(day));
+    });
+
+    // --- Lainnya (other) ---
+    const others = state.employees.filter(e=>e.aktif && e.kategori==="other");
+    function priority(emp){
+      const h = state.history[emp.id] || {total:0,lastWeek:null,quarantineUntil:null};
+      const inQuarantine = h.quarantineUntil && h.quarantineUntil >= state.weekKey;
+      const gap = h.lastWeek ? Math.round((new Date(state.weekKey)-new Date(h.lastWeek))/86400000/7) : 999;
+      return {emp, h, inQuarantine, gap};
+    }
+    let pool = others.map(priority).filter(p=>!p.inQuarantine);
+    let quarantinedPool = others.map(priority).filter(p=>p.inQuarantine);
+    pool.sort((a,b)=> b.gap - a.gap || a.h.total - b.h.total);
+
+    // fill all remaining open slots across the week
+    let progressed = true;
+    while(progressed){
+      progressed = false;
+      for(const day of DAYS){
+        if(state.dayConfig[day].libur) continue;
+        const slot = openSlot(day);
+        if(!slot) continue;
+        let candidateIdx = pool.findIndex(p=>!usedToday[day].has(p.emp.id) && isAvailable(p.emp.id, day));
+        if(candidateIdx>=0){
+          const cand = pool.splice(candidateIdx,1)[0];
+          place(cand.emp.id, day, slot);
+          progressed = true;
+        }
+      }
+    }
+    // second pass: use quarantined / recently-served people if slots still open, flagged as warning
+    quarantinedPool.sort((a,b)=> b.gap - a.gap);
+    progressed = true;
+    while(progressed){
+      progressed = false;
+      for(const day of DAYS){
+        if(state.dayConfig[day].libur) continue;
+        const slot = openSlot(day);
+        if(!slot) continue;
+        let idx = quarantinedPool.findIndex(p=>!usedToday[day].has(p.emp.id) && isAvailable(p.emp.id, day));
+        if(idx>=0){
+          const cand = quarantinedPool.splice(idx,1)[0];
+          place(cand.emp.id, day, slot);
+          warnings.push(`⚠️ ${cand.emp.nama} ditugaskan piket ${day} meski masih dalam masa jeda (piket minggu lalu) — tidak ada pengganti lain yang tersedia.`);
+          progressed = true;
+        }
+      }
+    }
+    // report unfilled
+    DAYS.forEach(day=>{
+      if(state.dayConfig[day].libur) return;
+      const c = state.dayConfig[day];
+      if(sched[day].pagi.length < c.pagi || sched[day].siang.length < c.siang){
+        warnings.push(`${day}: slot belum terisi penuh (Pagi ${sched[day].pagi.length}/${c.pagi}, Siang ${sched[day].siang.length}/${c.siang}) — perlu isi manual.`);
+      }
+    });
+    return sched;
+  }
+
+  function wasOnDutyLastWeek(empId, lastSched){
+    if(!lastSched) return false;
+    return DAYS.some(d=> (lastSched[d]?.pagi||[]).includes(empId) || (lastSched[d]?.siang||[]).includes(empId));
+  }
+
+  let lastWeekScheduleCache = null;
+
+  async function handleGenerate(){
+    const warnings = [];
+    lastWeekScheduleCache = await loadWeek(prevWeekKey(state.weekKey));
+    state.schedule = generateSchedule(warnings);
+    renderWarnings(warnings);
+    renderOutput();
+    renderHistoryTable();
+    renderPenyuluhStatus();
+  }
+
+  function renderWarnings(warnings){
+    const box = document.getElementById("warnBox");
+    if(warnings.length===0){
+      box.innerHTML = `<div class="ok-note">✓ Semua slot terisi tanpa pelanggaran aturan jeda piket.</div>`;
+    } else {
+      box.innerHTML = warnings.map(w=>`<div class="warn-note">⚠️&nbsp; ${w}</div>`).join("");
+    }
+  }
+
+  function empName(id){ const e = state.employees.find(x=>x.id===id); return e?e.nama:"?"; }
+  function empKat(id){ const e = state.employees.find(x=>x.id===id); return e?e.kategori:"other"; }
+
+  function eligibleForCell(day, sesi, currentId){
+    const currentEmp = state.employees.find(e=>e.id===currentId);
+    const sessionHasOtherPenyuluh = (state.schedule[day][sesi]||[]).some(id => id && id!==currentId && empKat(id)==="penyuluh");
+    return state.employees.filter(e=>{
+      if(e.id===currentId) return true;
+      if(!e.aktif || !isAvailable(e.id, day)) return false;
+      if(e.kategori==="penyuluh" && sessionHasOtherPenyuluh) return false; // maksimal 1 penyuluh per sesi
+      return true;
+    });
+  }
+
+  function renderOutput(){
+    const wsStart = state.weekKey, wsEnd = addDays(state.weekKey,4);
+    document.getElementById("scheduleTitle").textContent =
+      `JADWAL PETUGAS HELPDESK CORETAX TANGGAL ${fmtDate(wsStart)} – ${fmtDate(wsEnd)}  |  KPP PRATAMA KARAWANG`;
+
+    const table = document.getElementById("outputTable");
+    const maxCols = Math.max(...DAYS.map(d=>Math.max(state.dayConfig[d].pagi, state.dayConfig[d].siang)), 3);
+    let html = `<thead><tr><th>Hari/Tanggal</th><th>Sesi</th><th colspan="${maxCols}">Petugas Helpdesk Coretax</th><th>Koordinator</th></tr></thead><tbody>`;
+
+    DAYS.forEach((d,i)=>{
+      const cfg = state.dayConfig[d];
+      const dateLabel = fmtDate(addDays(state.weekKey,i));
+      if(cfg.libur){
+        html += `<tr class="libur"><td class="day-cell">${d}<br>${dateLabel}</td><td class="sesi-cell" colspan="${maxCols+2}">LIBUR</td></tr>`;
+        return;
+      }
+      ["pagi","siang"].forEach((sesi,si)=>{
+        const count = cfg[sesi];
+        if(count<=0) return;
+        html += `<tr>`;
+        if(si===0) html += `<td class="day-cell" rowspan="2">${d}<br><span class="util" style="font-weight:400;font-size:11px;">${dateLabel}</span></td>`;
+        html += `<td class="sesi-cell">${sesi==="pagi"?"Pagi":"Siang"}</td>`;
+        const ids = state.schedule[d] ? state.schedule[d][sesi] : [];
+        for(let c=0;c<maxCols;c++){
+          if(c>=count){ html += `<td></td>`; continue; }
+          const empId = ids[c];
+          html += `<td class="slot-cell" data-day="${d}" data-sesi="${sesi}" data-idx="${c}"></td>`;
+        }
+        if(si===0) html += `<td rowspan="2"><input type="text" class="coord-input" data-day="${d}" value="${escAttr((state.schedule[d]&&state.schedule[d].koordinator)||'')}" style="width:100%;border:none;background:transparent;font-family:Georgia,serif;" placeholder="—"></td>`;
+        html += `</tr>`;
+      });
+    });
+    html += `</tbody>`;
+    table.innerHTML = html;
+
+    // populate slot selects
+    table.querySelectorAll("td.slot-cell").forEach(td=>{
+      const day = td.getAttribute("data-day"), sesi = td.getAttribute("data-sesi"), idx = parseInt(td.getAttribute("data-idx"),10);
+      const ids = state.schedule[day][sesi];
+      const currentId = ids[idx] || "";
+      const opts = eligibleForCell(day, sesi, currentId);
+      const wasWarned = currentId && lastWeekScheduleCache && wasOnDutyLastWeek(currentId, lastWeekScheduleCache) && empKat(currentId)==="other";
+      let sel = `<select data-day="${day}" data-sesi="${sesi}" data-idx="${idx}" class="${wasWarned?'warn-slot':''}"><option value="">${wasWarned?'⚠️ ':''}${currentId?empName(currentId):"— kosong —"}</option>`;
+      const seen = new Set([currentId]);
+      opts.forEach(e=>{
+        if(seen.has(e.id)) return;
+        const warn = lastWeekScheduleCache && wasOnDutyLastWeek(e.id, lastWeekScheduleCache) && e.kategori==="other";
+        sel += `<option value="${e.id}">${warn?"⚠️ ":""}${e.nama} (${kategoriLabel(e.kategori)})</option>`;
+      });
+      sel += `<option value="__empty__">— kosongkan —</option></select>`;
+      td.innerHTML = sel;
+      td.querySelector("select").addEventListener("change", (ev)=>{
+        const val = ev.target.value;
+        if(val==="__empty__"){ state.schedule[day][sesi][idx] = null; }
+        else if(val){ state.schedule[day][sesi][idx] = val; }
+        renderOutput();
+      });
+    });
+    table.querySelectorAll(".coord-input").forEach(inp=>{
+      inp.addEventListener("change", ()=>{
+        const day = inp.getAttribute("data-day");
+        if(!state.schedule[day]) state.schedule[day] = {pagi:[],siang:[],koordinator:""};
+        state.schedule[day].koordinator = inp.value;
+      });
+    });
+  }
+
+  function renderHistoryTable(){
+    const body = document.getElementById("histBody");
+    body.innerHTML = "";
+    state.employees.filter(e=>e.aktif).forEach(emp=>{
+      const h = state.history[emp.id] || {total:0,lastWeek:null,quarantineUntil:null};
+      const assignedThisWeek = DAYS.some(d=>state.dayConfig[d] && !state.dayConfig[d].libur &&
+        ((state.schedule[d]?.pagi||[]).includes(emp.id) || (state.schedule[d]?.siang||[]).includes(emp.id)));
+      let status = assignedThisWeek ? "Piket minggu ini" : (h.quarantineUntil && h.quarantineUntil>=state.weekKey ? "Jeda (skip)" : "—");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${emp.nama}</td><td><span class="kat-pill kat-${emp.kategori}">${kategoriLabel(emp.kategori)}</span></td>
+        <td class="util">${h.total}</td><td class="util">${h.lastWeek?fmtDate(h.lastWeek):"-"}</td><td>${status}</td>`;
+      body.appendChild(tr);
+    });
+  }
+
+  async function handleSave(){
+    // update history based on current schedule
+    const assignedIds = new Set();
+    DAYS.forEach(d=>{
+      if(state.dayConfig[d].libur) return;
+      (state.schedule[d].pagi||[]).forEach(id=>id&&assignedIds.add(id));
+      (state.schedule[d].siang||[]).forEach(id=>id&&assignedIds.add(id));
+    });
+    assignedIds.forEach(id=>{
+      if(!state.history[id]) state.history[id] = {total:0,lastWeek:null,quarantineUntil:null};
+      const h = state.history[id];
+      h.total += 1;
+      h.lastWeek = state.weekKey;
+      const emp = state.employees.find(e=>e.id===id);
+      if(emp && emp.kategori==="other"){
+        const wasLast = lastWeekScheduleCache && wasOnDutyLastWeek(id, lastWeekScheduleCache);
+        if(wasLast) h.quarantineUntil = addDays(state.weekKey, 14); // skip next 2 weeks
+        else h.quarantineUntil = null;
+      }
+    });
+    // simpan kuota aktual penyuluh minggu ini (untuk rotasi 2x/3x minggu depan)
+    // dihitung langsung dari jadwal yang tersimpan, apapun sumbernya (generate otomatis / impor resmi / edit manual)
+    state.employees.filter(e=>e.aktif && e.kategori==="penyuluh").forEach(emp=>{
+      if(!state.history[emp.id]) state.history[emp.id] = {total:0,lastWeek:null,quarantineUntil:null};
+      const h = state.history[emp.id];
+      let actual = 0;
+      DAYS.forEach(d=>{
+        if(!state.dayConfig[d] || state.dayConfig[d].libur || !state.schedule[d]) return;
+        if((state.schedule[d].pagi||[]).includes(emp.id)) actual++;
+        if((state.schedule[d].siang||[]).includes(emp.id)) actual++;
+      });
+      h.penyuluhQuotaLastWeek = actual;
+      h.penyuluhQuotaWeek = state.weekKey;
+      delete h._plannedPenyuluhQuota;
+      delete h._actualPenyuluhCount;
+    });
+    await saveRoot();
+    await saveWeek();
+    renderHistoryTable();
+    renderEmployees();
+    renderPenyuluhStatus();
+    alert("Jadwal dan riwayat piket telah disimpan.");
+  }
+
+  // ---------- import past-week history ----------
+  const HIST_OPTS = [
+    {v:"-", l:"-"},
+    {v:"P", l:"P (Pagi)"},
+    {v:"S", l:"S (Siang)"},
+    {v:"x", l:"x (Tdk tersedia)"},
+    {v:"WFH", l:"WFH"}
+  ];
+  function renderHistImportForm(){
+    const head = document.getElementById("histImportHead");
+    head.innerHTML = "<th style='min-width:170px;'>Nama</th>" + DAYS.map(d=>`<th>${d}</th>`).join("") + "<th>Libur penuh</th>";
+    const body = document.getElementById("histImportBody");
+    body.innerHTML = "";
+    state.employees.forEach(emp=>{
+      const tr = document.createElement("tr");
+      let cells = `<td>${emp.nama} <span class="kat-pill kat-${emp.kategori}">${kategoriLabel(emp.kategori)}</span></td>`;
+      DAYS.forEach(d=>{
+        cells += `<td><select class="status" data-emp="${emp.id}" data-day="${d}">
+          ${HIST_OPTS.map(o=>`<option value="${o.v}">${o.l}</option>`).join("")}
+        </select></td>`;
+      });
+      cells += `<td style="text-align:center;"><input type="checkbox" data-fullweek="${emp.id}"></td>`;
+      tr.innerHTML = cells;
+      body.appendChild(tr);
+    });
+    body.querySelectorAll("[data-fullweek]").forEach(cb=>{
+      cb.addEventListener("change", ()=>{
+        const id = cb.getAttribute("data-fullweek");
+        body.querySelectorAll(`select[data-emp="${id}"]`).forEach(sel=>{ sel.disabled = cb.checked; if(cb.checked) sel.value="-"; });
+      });
+    });
+  }
+  document.getElementById("loadHistImportBtn").addEventListener("click", ()=>{
+    const ws = document.getElementById("histWeekStart").value;
+    if(!ws){ alert("Pilih tanggal Senin minggu yang ingin dicatat."); return; }
+    renderHistImportForm();
+  });
+  document.getElementById("saveHistImportBtn").addEventListener("click", async ()=>{
+    const ws = document.getElementById("histWeekStart").value;
+    if(!ws){ alert("Pilih tanggal Senin minggu yang ingin dicatat, lalu klik Muat Formulir."); return; }
+    const body = document.getElementById("histImportBody");
+    if(!body.children.length){ alert("Klik 'Muat Formulir' terlebih dahulu."); return; }
+    let updated = 0;
+    state.employees.forEach(emp=>{
+      const fullweek = body.querySelector(`[data-fullweek="${emp.id}"]`).checked;
+      if(fullweek) return; // tidak tersedia sepanjang minggu, tidak menambah riwayat piket
+      let hadDuty = false;
+      DAYS.forEach(d=>{
+        const sel = body.querySelector(`select[data-emp="${emp.id}"][data-day="${d}"]`);
+        if(sel && (sel.value==="P" || sel.value==="S")) hadDuty = true;
+      });
+      if(hadDuty){
+        if(!state.history[emp.id]) state.history[emp.id] = {total:0,lastWeek:null,quarantineUntil:null};
+        const h = state.history[emp.id];
+        h.total += 1;
+        if(!h.lastWeek || ws > h.lastWeek) h.lastWeek = ws;
+        updated++;
+      }
+    });
+    await saveRoot();
+    renderEmployees();
+    renderHistoryTable();
+    alert(`Riwayat minggu ${fmtDate(ws)} disimpan. ${updated} pegawai tercatat piket minggu tsb.`);
+  });
+
+  // ---------- ekspor ke Word ----------
+  function buildScheduleWordHtml(){
+    const wsStart = state.weekKey, wsEnd = addDays(state.weekKey,4);
+    const maxCols = Math.max(...DAYS.map(d=>Math.max(state.dayConfig[d].pagi, state.dayConfig[d].siang)), 3);
+    let rows = "";
+    DAYS.forEach((d,i)=>{
+      const cfg = state.dayConfig[d];
+      const dateLabel = fmtDate(addDays(state.weekKey,i));
+      if(cfg.libur){
+        rows += `<tr><td style="background:#20232b;color:#20232b;font-weight:bold;">${d}<br>${dateLabel}</td><td colspan="${maxCols+1}" style="background:#20232b;color:#fff;text-align:center;font-weight:bold;">LIBUR</td></tr>`;
+        return;
+      }
+      ["pagi","siang"].forEach((sesi,si)=>{
+        const count = cfg[sesi];
+        if(count<=0) return;
+        rows += "<tr>";
+        if(si===0) rows += `<td rowspan="2" style="background:#e7edf8;font-weight:bold;">${d}<br><span style="font-weight:normal;font-size:10px;">${dateLabel}</span></td>`;
+        rows += `<td style="font-family:'Courier New',monospace;font-size:11px;">${sesi==="pagi"?"Pagi":"Siang"}</td>`;
+        const ids = state.schedule[d] ? state.schedule[d][sesi] : [];
+        for(let c=0;c<maxCols;c++){
+          if(c>=count){ rows += "<td></td>"; continue; }
+          const id = ids[c];
+          rows += `<td>${id ? empName(id) : ""}</td>`;
+        }
+        if(si===0) rows += `<td rowspan="2"></td>`;
+        rows += "</tr>";
+      });
+    });
+    let headCols = "";
+    for(let c=0;c<maxCols;c++) headCols += `<th></th>`;
+    return `
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head><meta charset="utf-8"><title>Jadwal Piket Helpdesk Coretax</title></head>
+<body style="font-family:Calibri, Arial, sans-serif;">
+  <h3 style="text-align:center;">JADWAL PETUGAS HELPDESK CORETAX TANGGAL ${fmtDate(wsStart)} – ${fmtDate(wsEnd)}</h3>
+  <p style="text-align:center;">KPP PRATAMA KARAWANG</p>
+  <table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse;width:100%;">
+    <thead>
+      <tr style="background:#0f2247;color:#fff;">
+        <th>Hari/Tanggal</th><th>Sesi</th><th colspan="${maxCols}">Petugas Helpdesk Coretax</th><th>Koordinator</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+</body></html>`;
+  }
+  function exportToWord(){
+    const html = buildScheduleWordHtml();
+    const blob = new Blob(['\ufeff', html], {type: "application/msword"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `jadwal-piket-${state.weekKey}.doc`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+  }
+  document.getElementById("exportWordBtn").addEventListener("click", exportToWord);
+
+  document.getElementById("genBtn").addEventListener("click", handleGenerate);
+  document.getElementById("saveBtn").addEventListener("click", handleSave);
+  document.getElementById("printBtn").addEventListener("click", ()=>window.print());
+
+  document.getElementById("loadWeekBtn").addEventListener("click", async ()=>{
+    const ws = document.getElementById("weekStart").value;
+    if(!ws){ alert("Pilih tanggal Senin terlebih dahulu."); return; }
+    state.weekKey = weekKeyFromStart(ws);
+    const existing = await loadWeek(state.weekKey);
+    if(existing){
+      state.dayConfig = existing.dayConfig;
+      state.availability = existing.availability;
+      state.schedule = existing.schedule;
+    } else if(WEEK_SEEDS[state.weekKey]){
+      const seed = WEEK_SEEDS[state.weekKey];
+      state.dayConfig = JSON.parse(JSON.stringify(seed.dayConfig));
+      state.availability = {};
+      state.schedule = JSON.parse(JSON.stringify(seed.schedule));
+    } else {
+      state.dayConfig = defaultDayConfig();
+      state.availability = {};
+      state.schedule = {}; DAYS.forEach(d=>state.schedule[d]={pagi:[],siang:[],koordinator:""});
+    }
+    renderDayConfig();
+    renderAvailability();
+    lastWeekScheduleCache = await loadWeek(prevWeekKey(state.weekKey));
+    renderOutput();
+    renderHistoryTable();
+    renderPenyuluhStatus();
+    document.getElementById("warnBox").innerHTML = "";
+  });
+
+  function nextMonday(){
+    const d = new Date();
+    const day = d.getDay();
+    const diff = (8-day)%7 || 7;
+    if(day!==1) d.setDate(d.getDate()+diff);
+    const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,"0"), dd = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${dd}`;
+  }
+
+  // ---------- gerbang login (passcode sederhana) ----------
+  let currentUserName = "";
+  async function getAuthConfig(){
+    try{
+      const r = await window.storage.get("auth-config", true);
+      if(r && r.value) return JSON.parse(r.value);
+    }catch(e){ /* belum ada passcode diset */ }
+    return null;
+  }
+  async function setAuthConfig(cfg){
+    try{ await window.storage.set("auth-config", JSON.stringify(cfg), true); }catch(e){ console.error(e); }
+  }
+  function showLockError(msg){ document.getElementById("lockErr").textContent = msg; }
+
+  async function initLockScreen(){
+    const cfg = await getAuthConfig();
+    const isSetupMode = !cfg;
+    const title = document.getElementById("lockTitle");
+    const sub = document.getElementById("lockSub");
+    const passLabel = document.getElementById("lockPassLabel");
+    const pass2Label = document.getElementById("lockPass2Wrap");
+    const pass2Input = document.getElementById("lockPass2");
+    const submitBtn = document.getElementById("lockSubmitBtn");
+
+    if(isSetupMode){
+      title.textContent = "Buat Passcode Baru";
+      sub.textContent = "Belum ada passcode untuk aplikasi ini. Buat passcode yang akan dipakai bersama tim.";
+      passLabel.textContent = "Passcode Baru (min. 4 karakter)";
+      pass2Label.style.display = "block";
+      pass2Input.style.display = "block";
+      submitBtn.textContent = "Buat & Masuk";
+    } else {
+      title.textContent = "Masuk ke Aplikasi";
+      sub.textContent = "Masukkan passcode untuk mengakses penyusun jadwal piket.";
+      passLabel.textContent = "Passcode";
+      pass2Label.style.display = "none";
+      pass2Input.style.display = "none";
+      submitBtn.textContent = "Masuk";
+    }
+
+    document.getElementById("lockForm").onsubmit = async (ev)=>{
+      ev.preventDefault();
+      showLockError("");
+      const name = document.getElementById("lockName").value.trim();
+      const pass = document.getElementById("lockPass").value;
+      if(isSetupMode){
+        const pass2 = pass2Input.value;
+        if(pass.length < 4){ showLockError("Passcode minimal 4 karakter."); return; }
+        if(pass !== pass2){ showLockError("Passcode dan ulangi passcode tidak sama."); return; }
+        await setAuthConfig({passcode: pass});
+        currentUserName = name;
+        unlockApp();
+      } else {
+        if(pass !== cfg.passcode){ showLockError("Passcode salah."); return; }
+        currentUserName = name;
+        unlockApp();
+      }
+    };
+  }
+
+  function unlockApp(){
+    document.getElementById("lockScreen").style.display = "none";
+    document.getElementById("appContent").style.display = "block";
+    if(currentUserName){
+      const eyebrow = document.querySelector("header.app .eyebrow");
+      if(eyebrow) eyebrow.textContent = `KPP Pratama Karawang · Seksi Pelayanan · Masuk sebagai: ${currentUserName}`;
+    }
+    init();
+  }
+
+  async function changePasscode(){
+    const cfg = await getAuthConfig();
+    const current = prompt("Masukkan passcode saat ini untuk konfirmasi:");
+    if(current === null) return;
+    if(!cfg || current !== cfg.passcode){ alert("Passcode saat ini salah."); return; }
+    const baru = prompt("Passcode baru (min. 4 karakter):");
+    if(baru===null) return;
+    if(baru.length < 4){ alert("Passcode minimal 4 karakter."); return; }
+    const ulangi = prompt("Ulangi passcode baru:");
+    if(baru !== ulangi){ alert("Passcode tidak sama."); return; }
+    await setAuthConfig({passcode: baru});
+    alert("Passcode berhasil diganti.");
+  }
+  window.changePasscode = changePasscode;
+
+  initLockScreen();
+
+  async function init(){
+    await loadRoot();
+    renderEmployees();
+    document.getElementById("weekStart").value = nextMonday();
+    state.weekKey = document.getElementById("weekStart").value;
+    state.dayConfig = defaultDayConfig();
+    state.availability = {};
+    state.schedule = {}; DAYS.forEach(d=>state.schedule[d]={pagi:[],siang:[]});
+    renderDayConfig();
+    renderAvailability();
+    renderOutput();
+    renderHistoryTable();
+    renderPenyuluhStatus();
+  }
+})();
+</script>
+</body>
+</html>
